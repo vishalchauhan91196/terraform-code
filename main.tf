@@ -38,6 +38,13 @@ module "vpc_routes" {
   nat_gateway_id      = module.nat_gws.nat_ids
 }
 
+module "lambda-scheduler-ec2-stop-start" {
+  source         = "https://github.com/vishalchauhan91196/terraform-modules.git//lambda-scheduler-ec2-stop-start"
+  application    = local.application
+  environment    = var.environment
+  region         = var.region
+}
+
 
 
 

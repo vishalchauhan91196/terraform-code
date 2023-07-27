@@ -16,9 +16,10 @@ module "rds" {
   vpc_security_group_ids  = [module.rds_sg_useast1.security_group_id]
 }
 
-module "lambda-scheduler-ec2-stop-start" {
-  source         = "https://github.com/vishalchauhan91196/terraform-modules.git//lambda-scheduler-ec2-stop-start"
-  application    = local.application
-  environment    = var.environment
-  region         = var.region
+module "secrets_manager" {
+  source                    = "https://github.com/vishalchauhan91196/terraform-modules.git//secrets-manager"
+  payload_secrets_manager   = local.payload_secrets_manager[var.region]
+  rds_engine                = module.rds.db_instance_engine
+  rds_address               = module.rds.db_instance_address
+  rds_dbInstanceIdentifier  = module.rds.db_instance_id
 }

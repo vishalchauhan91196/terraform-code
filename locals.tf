@@ -203,4 +203,16 @@ locals {
       }
     ]
   }
+
+  payload_secrets_manager = {
+    us-east-1 = [
+      {
+        name          = "${local.application}-${var.environment}-${var.region}-secrets-manager"
+        description   = "Access to MSSQL ${var.environment} database for ${local.application} in ${var.region} region"
+        rds_name      = "${local.application}-${var.environment}-${var.region}-mssql-rds"
+        rds_username  = var.rds_username
+        rds_password  = var.rds_password
+      }
+    ]
+  }
 }
