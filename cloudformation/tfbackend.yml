@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Create terraform backend resources
+Parameters:
+  AppName:
+    Type: String
+  AccountID:
+    Type: String
+  Environment:
+    Type: String
+    Description: Select the environment to deploy
+    ConstraintDescription: Must be any of the available options
+
+Resources:
+  BackendBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      BucketName: !Sub ${AppName}-tfstate-${Environment}-${AccountID}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+
+  BackendDynamoDbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AppName}-tfstate-lock-${Environment}-${AccountID}
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 20
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+
+Outputs:
+  BackendBucket:
+    Value: !Ref BackendBucket
+  BackendDynamoDbTable:
+    Value: !Ref BackendDynamoDbTable
