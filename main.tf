@@ -45,7 +45,26 @@ module "lambda-scheduler-ec2-stop-start" {
   region         = var.region
 }
 
+module "fsx_sg_useast1" {
+  source                = "https://github.com/vishalchauhan91196/terraform-modules.git//security-group"
+  create                = true
+  name                  = "${local.application}-${var.environment}-${var.region}-fsx-security-group"
+  vpc_id                = module.vpc.vpc_ids["${local.application}-${var.environment}-${var.region}-vpc"]
+  source_cidr_block     = true
+  source_cidr_rules     = local.payload_fsx_cidr_rules[var.region]
+  source_security_group = false
+  source_self           = false
+  tags                  = local.common_tags
+}
 
+module "fsx" {
+  source                          = "https://github.com/vishalchauhan91196/terraform-modules.git//fsx"
+  payload_fsx                     = local.payload_fsx[var.region]
+  subnet_ids                      = module.subnet.subnet_ids
+  aws_directory_service_directory = module.directory_service.id
+  security_group_ids              = [module.fsx_sg_useast1.security_group_id]
+  tags                            = local.common_tags
+}
 
 
 

@@ -215,4 +215,46 @@ locals {
       }
     ]
   }
+
+  payload_fsx_cidr_rules  = {
+    us-east-1 = [
+      {
+        type        = "ingress"
+        cidr_blocks = [module.vpc.vpc_cidr_blocks["${local.application}-${var.environment}-${var.region}-vpc"]]
+        from_port   = 445
+        to_port     = 445
+        protocol    = "tcp"
+        description = "Allow custom inbound traffic"
+      },
+      {
+        type        = "egress"
+        cidr_blocks = ["0.0.0.0/0"]
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        description = "Allow IPv4 all outbound traffic"
+      },
+      {
+        type        = "egress"
+        ipv6_cidr_blocks = ["::/0"]
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        description = "Allow IPv6 all outbound traffic"
+      }
+    ]
+  }
+
+  payload_fsx = {
+    us-east-1 = [
+      {
+        name                  = "${local.application}-${var.environment}-${var.region}-fsx"
+        throughput_capacity   = 1024
+        storage_capacity      = 50
+        deployment_type       = "MULTI_AZ_1"
+        active_directory_name = "companyad.local"
+        subnet_name           = ["${local.application}-${var.environment}-${var.region}-private-azA", "${local.application}-${var.environment}-${var.region}-private-azB"]
+      }
+    ]
+  } 
 }
